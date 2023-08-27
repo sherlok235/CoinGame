@@ -25,11 +25,10 @@
 #ifndef __HELLOWORLD_SCENE_H__
 #define __HELLOWORLD_SCENE_H__
 
-#include "SonarFrameworks.h"
 #include "Definitions.h"
-//#include "coinitem.h"
 #include "coinfactory.h"
-#include "cocos2d.h"
+
+#include <vector>
 
 class GameScene : public cocos2d::Scene
 {
@@ -41,11 +40,17 @@ public:
     
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
+    bool onTouchBegan(Touch* touch, Event* event);
+    void onTouchEnded(Touch* touch, Event* event);
+    void onTouchMoved(Touch* touch, Event* event);
 
     // implement the "static create()" method manually
     CREATE_FUNC(GameScene);
 private:
     int coinQuantityOnStart;
+    Vec2 oldTouchLocation;
+    CoinSpace::CoinItem * selectedCoin;
+    std::vector<CoinSpace::CoinItem*> Coins;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

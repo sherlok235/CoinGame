@@ -43,7 +43,7 @@ if(NOT DEFINED BUILD_ENGINE_DONE) # to test TestDev into root project
     add_subdirectory(${COCOS2DX_ROOT_PATH}/cocos ${ENGINE_BINARY_PATH}/cocos/core)
 endif()
 
-# record sources, headers, resources..
+# record sources, head ers, resources..
 set(GAME_SOURCE)
 set(GAME_HEADER)
 
@@ -103,11 +103,6 @@ elseif(APPLE)
              proj.ios_mac/ios/main.m
              proj.ios_mac/ios/AppController.mm
              proj.ios_mac/ios/RootViewController.mm
-#             Classes/Cocos-Helper-master/SonarCocosHelperCPP/IOSResults.mm
-#             Classes/Cocos-Helper-master/SonarCocosHelperCPP/IOSCPPHelper.mm
-#             Classes/Cocos-Helper-master/SonarCocosHelperCPP/IOSCPPHelper.mm
-#             Classes/Cocos-Helper-master/SonarCocosHelperCPP/IOSHelper.m
-
              proj.ios_mac/ios/Prefix.pch
              ${APP_UI_RES}
              )
@@ -132,15 +127,10 @@ set(all_code_files
     )
 if(NOT ANDROID)
     add_executable(${APP_NAME} ${all_code_files}
-        Classes/Definitions.h
-        Classes/Cocos-Helper-master/SonarCocosHelperCPP/SonarFrameworks.cpp
-        Classes/Cocos-Helper-master/SonarCocosHelperCPP/SonarFrameworks.h
-#        Classes/Cocos-Helper-master/SonarCocosHelperCPP/SCHDefinitions.h
-#        Classes/Cocos-Helper-master/SonarCocosHelperCPP/IOSCPPHelper.h
-#        Classes/Cocos-Helper-master/SonarCocosHelperCPP/SCHSettings.h
-#        Classes/Cocos-Helper-master/SonarCocosHelperCPP/IOSResults.h
-#        Classes/Cocos-Helper-master/SonarCocosHelperCPP/IOSHelper.h
 
+        Classes/Definitions.h
+#        Classes/Cocos-Helper-master/SonarCocosHelperCPP/SonarFrameworks.cpp
+#        Classes/Cocos-Helper-master/SonarCocosHelperCPP/SonarFrameworks.h
     )
 else()
     add_library(${APP_NAME} SHARED ${all_code_files})

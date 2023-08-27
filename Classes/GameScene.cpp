@@ -29,7 +29,7 @@ USING_NS_CC;
 GameScene::GameScene()
 {
     coinQuantityOnStart = 6;
-
+    Coins.reserve(coinQuantityOnStart + 10);
 }
 
 Scene* GameScene::createScene()
@@ -68,11 +68,18 @@ bool GameScene::init()
         }
         x_random = cocos2d::RandomHelper::random_int(0,int(Director::getInstance()->getVisibleSize().width - 300));
         y_random = cocos2d::RandomHelper::random_int(0,int(Director::getInstance()->getVisibleSize().height- 300));
-        //auto cointEntity = CoinItem::create(coinType);
-        auto coinEntity =CoinSpace::CoinFactory::CreateCoin(coinType);
-        coinEntity->setPosition(cocos2d::Size(x_random,y_random));
+        auto coinEntity = CoinSpace::CoinFactory::CreateCoin(coinType);
+        coinEntity->setPosition(x_random,y_random);
+//        coinEntity->init();//// may be deleted it
+        Coins.push_back(coinEntity);
         this->addChild(coinEntity);
     }
+
+    auto touchListener = EventListenerTouchOneByOne::create();
+    touchListener->onTouchBegan = CC_CALLBACK_2(GameScene::onTouchBegan, this);
+    touchListener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this);
+    touchListener->onTouchMoved = CC_CALLBACK_2(GameScene::onTouchMoved, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
 
     return true;
 }
@@ -81,4 +88,33 @@ bool GameScene::init()
 void GameScene::menuCloseCallback(Ref* pSender)
 {
     Director::getInstance()->end();
+}
+
+bool GameScene::onTouchBegan(Touch *touch, Event *event)
+{
+    oldTouchLocation = touch->getLocation();
+    oldTouchLocation = this->convertToNodeSpace(oldTouchLocation);
+    for (auto coin : Coins) {
+        if (coin->getBoundingBox().containsPoint(touch->getLocation())) {
+            // Handle the touch event for the specific coin
+            coin->onTouchBegan(touch, event);
+            selectedCoin = coin;
+        }
+    }
+
+    return true;
+}
+
+void GameScene::onTouchEnded(Touch *touch, Event *event)
+{
+    CCLOG("%f,%f",selectedCoin->getPositionX(), selectedCoin->getPositionY());
+}
+
+void GameScene::onTouchMoved(Touch *touch, Event *event)
+{
+    Vec2 currentTouchLocation = touch->getLocation();
+
+    // Calculate offset from old touch location
+    Vec2 offset = currentTouchLocation - oldTouchLocation;
+    selectedCoin->onTouchMoved(touch,event);
 }

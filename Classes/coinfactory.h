@@ -5,12 +5,12 @@
 
 namespace CoinSpace {
 
-class CoinFactory
-{
-public:
-    CoinFactory();
-    static CoinItem * CreateCoin(int type);
-};
+    class CoinFactory
+    {
+    public:
+        CoinFactory();
+        static CoinItem * CreateCoin(int type);
+    };
 
 } // namespace CoinSpace
 
