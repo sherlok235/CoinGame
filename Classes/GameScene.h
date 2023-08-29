@@ -28,7 +28,8 @@
 #include "Definitions.h"
 #include "coinfactory.h"
 
-#include <vector>
+#include <array>
+#include <set>
 
 class GameScene : public cocos2d::Scene
 {
@@ -44,13 +45,15 @@ public:
     void onTouchEnded(Touch* touch, Event* event);
     void onTouchMoved(Touch* touch, Event* event);
 
+    bool CoinsAreOverlap(std::array<CoinSpace::CoinItem*,3>);
+
     // implement the "static create()" method manually
     CREATE_FUNC(GameScene);
 private:
     int coinQuantityOnStart;
     Vec2 oldTouchLocation;
     CoinSpace::CoinItem * selectedCoin;
-    std::vector<CoinSpace::CoinItem*> Coins;
+    std::multiset<CoinSpace::CoinItem*> Coins;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

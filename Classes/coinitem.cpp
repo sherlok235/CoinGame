@@ -52,13 +52,11 @@ bool CoinItem::onTouchBegan(Touch *touch, Event *event)
 void CoinItem::onTouchEnded(Touch *touch, Event *event)
 {
    initialpos = touch->getLocation();
-
 }
 
 void CoinItem::onTouchMoved(Touch *touch, Event *event)
 {
     targetPosition = touch->getLocation();
-//    moveToTarget();
     auto currentPos = initialpos;
 
     auto direction = targetPosition - currentPos;
@@ -75,26 +73,7 @@ void CoinItem::onTouchMoved(Touch *touch, Event *event)
     // Update position, clamped to bounds
     this->setPosition(newPos);
 }
-// you should to delete it
-void CoinItem::moveToTarget() {
 
-    auto currentPos = initialpos;
-
-    auto direction = targetPosition - currentPos;
-
-    // Don't normalize as we want to move exactly to target
-
-    auto newPos = currentPos + direction;
-
-    // Clamp new position to visible bounds
-    auto visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
-    newPos.x = std::min(visibleSize.width, std::max(0.f, newPos.x));
-    newPos.y = std::min(visibleSize.height, std::max(0.f, newPos.y));
-
-    // Update position, clamped to bounds
-    this->setPosition(newPos);
-
-}
 CoinItem::~CoinItem()
 {
 
@@ -116,6 +95,11 @@ void CoinItem::setFrameRect(cocos2d::Size size)
     auto frame = new cocos2d::SpriteFrame();
     frame->setRect(cocos2d::Rect(this->getPosition(),cocos2d::Size(size.width,size.height)));
     this->createWithSpriteFrame(frame);
+}
+
+bool CoinItem::operator<(CoinItem *other)
+{
+    return this->getPosition() < other->getPosition();
 }
 
 void CoinItem::setWidthRect(float newWidthRect)

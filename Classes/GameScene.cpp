@@ -29,7 +29,7 @@ USING_NS_CC;
 GameScene::GameScene()
 {
     coinQuantityOnStart = 6;
-    Coins.reserve(coinQuantityOnStart + 10);
+    //Coins.reserve(coinQuantityOnStart + 10);
 }
 
 Scene* GameScene::createScene()
@@ -70,8 +70,7 @@ bool GameScene::init()
         y_random = cocos2d::RandomHelper::random_int(0,int(Director::getInstance()->getVisibleSize().height- 300));
         auto coinEntity = CoinSpace::CoinFactory::CreateCoin(coinType);
         coinEntity->setPosition(x_random,y_random);
-//        coinEntity->init();//// may be deleted it
-        Coins.push_back(coinEntity);
+        Coins.insert(coinEntity);
         this->addChild(coinEntity);
     }
 
@@ -92,8 +91,6 @@ void GameScene::menuCloseCallback(Ref* pSender)
 
 bool GameScene::onTouchBegan(Touch *touch, Event *event)
 {
-    oldTouchLocation = touch->getLocation();
-    oldTouchLocation = this->convertToNodeSpace(oldTouchLocation);
     for (auto coin : Coins) {
         if (coin->getBoundingBox().containsPoint(touch->getLocation())) {
             // Handle the touch event for the specific coin
@@ -107,14 +104,64 @@ bool GameScene::onTouchBegan(Touch *touch, Event *event)
 
 void GameScene::onTouchEnded(Touch *touch, Event *event)
 {
-    CCLOG("%f,%f",selectedCoin->getPositionX(), selectedCoin->getPositionY());
+   // CCLOG("%f,%f",selectedCoin->getPositionX(), selectedCoin->getPositionY());
+     auto start = Coins.begin(),Temp =Coins.begin(),end = Coins.end();
+    std::array<CoinSpace::CoinItem*, 3> temp;
+     CoinSpace::CoinItem* buff = nullptr;
+    for (auto i = 0; i != (Coins.size() - 3); ++i) {
+        Temp = start;
+        if(Temp != end){
+            temp[0] = (*start);
+            buff = temp[1];
+            Temp = std::next(start);
+
+            if(Temp != end){
+                temp[1] = (*Temp);
+                Temp = std::next(start, 2);
+
+                if(Temp != end){
+                    temp[2] = (*Temp);
+                }else{
+                    temp[2] = nullptr;
+                    buff = temp[1];
+                    break;
+                }
+            }else{
+                temp[1] = nullptr;
+                temp[2] = nullptr;
+                break;
+            }
+        }
+        else{
+            break;
+        }
+        std::advance(start, 2); // Move the iterator forward by 2 positions
+        if(CoinsAreOverlap(temp))
+            break;
+    }
+    if(temp[2] == nullptr && temp[1] != nullptr){
+        temp[2] = buff;
+        CoinsAreOverlap(temp);
+    }
 }
 
 void GameScene::onTouchMoved(Touch *touch, Event *event)
 {
-    Vec2 currentTouchLocation = touch->getLocation();
-
-    // Calculate offset from old touch location
-    Vec2 offset = currentTouchLocation - oldTouchLocation;
     selectedCoin->onTouchMoved(touch,event);
+}
+
+bool GameScene::CoinsAreOverlap(std::array<CoinSpace::CoinItem *,3>coins)
+{
+    auto box1 = coins[0]->getBoundingBox();
+    auto box2 = coins[1]->getBoundingBox();
+    auto box3 = coins[2]->getBoundingBox();
+
+    // Check overlaps
+    if (box1.intersectsRect(box2) &&
+        box2.intersectsRect(box3) &&
+        box3.intersectsRect(box1)) {
+        CCLOG("Are overlap");
+        return true;
+    }
+    return false;
 }

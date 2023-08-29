@@ -25,14 +25,17 @@ namespace CoinSpace{
     public:
         CoinItem();
         CoinItem(int type);
+
         virtual bool onTouchBegan(Touch* touch, Event* event) ;
         virtual void onTouchEnded(Touch* touch, Event* event) ;
         virtual void onTouchMoved(Touch* touch, Event* event) ;
-        void moveToTarget();
 
         void setWidthRect(float newWidthRect);
         void setHeightRect(float newHeightRect);
         void setFrameRect(cocos2d::Size size);
+
+        bool operator< (CoinItem * other);
+
         virtual ~CoinItem();
     protected:
         cocos2d::Vec2 targetPosition, initialpos;
