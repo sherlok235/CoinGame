@@ -8,6 +8,8 @@ Coin_0::Coin_0():CoinItem(0)
     mType = 0;
     setContentSize(cocos2d::Size(65,65));
     CoinItem::mType = 0;
+//    if(coin_4_IsCreated && coin_7_IsCreated)
+//        exit(0);
 }
 
 Coin_0::~Coin_0()
@@ -23,8 +25,6 @@ CoinItem::CoinItem(int type)
 {
     setDefaultImage(type);
     temp = true;
-//    setBoun
-    //setPhysicsBody(cocos2d::PhysicsBody().addShape())
 }
 
 bool CoinItem::onTouchBegan(Touch *touch, Event *event)
@@ -58,13 +58,6 @@ void CoinItem::onTouchMoved(Touch *touch, Event *event)
 
     // Update position, clamped to bounds
     this->setPosition(newPos);
-
-
-//   auto diff = touch->getDelta();
-
-   // Update position using offset
-//   touch->_point = touch->getLocation();
-//   this->setPosition(touch->getLocation() + diff);
 }
 
 CoinItem::~CoinItem()
@@ -93,13 +86,6 @@ void CoinItem::setContentSize(cocos2d::Size size)
     auto frame = new cocos2d::SpriteFrame();
     frame->setRect(cocos2d::Rect(this->getPosition(),cocos2d::Size(size.width,size.height)));
     this->createWithSpriteFrame(frame);
-//    setAnchorPoint(cocos2d::Vec2(0,0));
-
-//    this->setHeightRect(size.height);
-//    this->setWidthRect(size.width);
-
-//    setColor(cocos2d::Color3B::BLACK);
-
 }
 
 bool CoinItem::operator<(CoinItem *other)
@@ -116,7 +102,6 @@ Coin_1::Coin_1():CoinItem(1)
 {
     CoinItem::mType = 1;
     setContentSize(cocos2d::Size(86,92));
-    //    setDefaultImage(mType);
 }
 
 Coin_1::~Coin_1()
@@ -147,6 +132,8 @@ Coin_3::~Coin_3()
 
 Coin_4::Coin_4():CoinItem(4){
     coin_4_IsCreated = true;
+    if(coin_7_IsCreated)
+        exit(0);
     CoinItem::mType = 4;
     setContentSize(cocos2d::Size(116,120));
 
@@ -183,6 +170,8 @@ Coin_6::~Coin_6()
 Coin_7::Coin_7():CoinItem(7)
 {
     coin_7_IsCreated = true;
+    if(coin_4_IsCreated)
+        exit(0);
     CoinItem::mType = 7;
     setContentSize(cocos2d::Size(107,116));
 

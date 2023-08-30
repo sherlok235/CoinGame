@@ -46,20 +46,18 @@ public:
     bool onTouchBegan(Touch* touch, Event* event);
     void onTouchEnded(Touch* touch);
     void onTouchMoved(Touch* touch, Event* event);
-    CoinSpace::CoinItem * MakeRandomlyPlacedCoin(int type);
+    [[nodiscard]] CoinSpace::CoinItem * MakeRandomlyPlacedCoin(int type);
 
     bool CoinsAreOverlap(std::array<CoinSpace::CoinItem*,3>);
 
     // implement the "static create()" method manually
     CREATE_FUNC(GameScene);
 private:
+    bool wasMoved = false;
     int coinQuantityOnStart;
     Vec2 oldTouchLocation;
     CoinSpace::CoinItem * selectedCoin;
-//    std::vector<CoinSpace::CoinItem*> Coins;
     std::map<int, std::vector<CoinSpace::CoinItem *>> Coins;
-
-
 };
 
 #endif // __HELLOWORLD_SCENE_H__
