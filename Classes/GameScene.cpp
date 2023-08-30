@@ -29,7 +29,7 @@ USING_NS_CC;
 GameScene::GameScene()
 {
     coinQuantityOnStart = 6;
-    //Coins.reserve(coinQuantityOnStart + 10);
+   // Coins.reserve(coinQuantityOnStart + 10);
 }
 
 Scene* GameScene::createScene()
@@ -59,24 +59,22 @@ bool GameScene::init()
     sprite->setScale(2.26f,2.9f);
     this->addChild( sprite );
 
-    int coinType = 0, x_random, y_random;
+    int coinType = 0;
 
     for(size_t i = 0; i < coinQuantityOnStart;++i){
         if(i>2 && coinType == 0 )
         {
             coinType = 5;
         }
-        x_random = cocos2d::RandomHelper::random_int(0,int(Director::getInstance()->getVisibleSize().width - 300));
-        y_random = cocos2d::RandomHelper::random_int(0,int(Director::getInstance()->getVisibleSize().height- 300));
-        auto coinEntity = CoinSpace::CoinFactory::CreateCoin(coinType);
-        coinEntity->setPosition(x_random,y_random);
-        Coins.insert(coinEntity);
+
+        auto coinEntity = MakeRandomlyPlacedCoin(coinType);
+        Coins[coinType].push_back(coinEntity);
         this->addChild(coinEntity);
     }
 
     auto touchListener = EventListenerTouchOneByOne::create();
     touchListener->onTouchBegan = CC_CALLBACK_2(GameScene::onTouchBegan, this);
-    touchListener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this);
+    touchListener->onTouchEnded = CC_CALLBACK_1(GameScene::onTouchEnded, this);
     touchListener->onTouchMoved = CC_CALLBACK_2(GameScene::onTouchMoved, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
 
@@ -91,63 +89,65 @@ void GameScene::menuCloseCallback(Ref* pSender)
 
 bool GameScene::onTouchBegan(Touch *touch, Event *event)
 {
-    for (auto coin : Coins) {
-        if (coin->getBoundingBox().containsPoint(touch->getLocation())) {
-            // Handle the touch event for the specific coin
-            coin->onTouchBegan(touch, event);
-            selectedCoin = coin;
+    event->stopPropagation();
+    for(int i = 0; i<=7;++i){
+        if(Coins[i].empty())
+            continue;
+
+        for (auto coin : Coins[i]) {
+            if (coin->getBoundingBox().containsPoint(touch->getLocation())) {
+                // Handle the touch event for the specific coin
+                coin->onTouchBegan(touch, event);
+                selectedCoin = coin;
+            }
         }
     }
 
     return true;
 }
 
-void GameScene::onTouchEnded(Touch *touch, Event *event)
+void GameScene::onTouchEnded(Touch *touch)
 {
-   // CCLOG("%f,%f",selectedCoin->getPositionX(), selectedCoin->getPositionY());
-     auto start = Coins.begin(),Temp =Coins.begin(),end = Coins.end();
-    std::array<CoinSpace::CoinItem*, 3> temp;
-     CoinSpace::CoinItem* buff = nullptr;
-    for (auto i = 0; i != (Coins.size() - 3); ++i) {
-        Temp = start;
-        if(Temp != end){
-            temp[0] = (*start);
-            buff = temp[1];
-            Temp = std::next(start);
+    std::set<std::array<CoinSpace::CoinItem*, 3>> overlappingCombos;
+    int selectedType = selectedCoin->type();
 
-            if(Temp != end){
-                temp[1] = (*Temp);
-                Temp = std::next(start, 2);
+    for (size_t i = 0; i < Coins[selectedType].size() - 2; i++) {
+        for (size_t j = i + 1; j < Coins[selectedType].size() - 1; j++) {
+            for (size_t k = j + 1; k < Coins[selectedType].size(); k++) {
+                std::array<CoinSpace::CoinItem*, 3> combo = {
+                    Coins[selectedType][i],
+                    Coins[selectedType][j], Coins[selectedType][k]};
+//                std::sort(combo.begin(), combo.end());
 
-                if(Temp != end){
-                    temp[2] = (*Temp);
-                }else{
-                    temp[2] = nullptr;
-                    buff = temp[1];
+                if (overlappingCombos.find(combo) != overlappingCombos.end()) {
+                    continue; // Skip this combination, it has already been checked
+                }
+
+                if(CoinsAreOverlap(combo)){
                     break;
                 }
-            }else{
-                temp[1] = nullptr;
-                temp[2] = nullptr;
-                break;
             }
         }
-        else{
-            break;
-        }
-        std::advance(start, 2); // Move the iterator forward by 2 positions
-        if(CoinsAreOverlap(temp))
-            break;
     }
-    if(temp[2] == nullptr && temp[1] != nullptr){
-        temp[2] = buff;
-        CoinsAreOverlap(temp);
-    }
+
 }
 
 void GameScene::onTouchMoved(Touch *touch, Event *event)
 {
+//    touch->setTouchInfo(4,0.0f,0.0f,4.2f,9.0f);
+//    touch->retain();
     selectedCoin->onTouchMoved(touch,event);
+}
+
+CoinSpace::CoinItem *GameScene::MakeRandomlyPlacedCoin(int type)
+{
+    int x_random, y_random;
+    x_random = cocos2d::RandomHelper::random_int(0,int(Director::getInstance()->getVisibleSize().width - 300));
+    y_random = cocos2d::RandomHelper::random_int(0,int(Director::getInstance()->getVisibleSize().height- 300));
+    auto coinEntity = CoinSpace::CoinFactory::CreateCoin(type);
+    coinEntity->setPosition(x_random,y_random);
+    return coinEntity;
+
 }
 
 bool GameScene::CoinsAreOverlap(std::array<CoinSpace::CoinItem *,3>coins)
@@ -155,13 +155,33 @@ bool GameScene::CoinsAreOverlap(std::array<CoinSpace::CoinItem *,3>coins)
     auto box1 = coins[0]->getBoundingBox();
     auto box2 = coins[1]->getBoundingBox();
     auto box3 = coins[2]->getBoundingBox();
-
-    // Check overlaps
+    float epsilon = 140.0f;
+    bool overlap12 = false,overlap13 = false,overlap23 = false;
     if (box1.intersectsRect(box2) &&
         box2.intersectsRect(box3) &&
         box3.intersectsRect(box1)) {
-        CCLOG("Are overlap");
-        return true;
+
+        if (abs(box1.getMaxX() - box2.getMinX()) < epsilon) {
+            overlap12 = true;
+        }
+//        CCLOG("%f \n",abs(box1.getMaxX() - box2.getMinX()));
+
+        // Check box1 and box3
+        if (abs(box1.getMaxX() - box3.getMinX()) < epsilon) {
+            overlap13 = true;
+
+        }
+//        CCLOG("%f \n",abs(box1.getMaxX() - box3.getMinX()));
+        if (abs(box2.getMaxX() - box3.getMinX()) < epsilon) {
+            overlap23 = true;
+        }
+//        CCLOG("%f \n",abs(box2.getMaxX() - box3.getMinX()));
+        // See if all overlaps occurred
+        if (overlap12 && overlap13 && overlap23) {
+            // All boxes overlap
+                CCLOG("Are overlap");
+                return true;
+        }
     }
     return false;
 }

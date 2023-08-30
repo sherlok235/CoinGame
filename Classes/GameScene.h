@@ -29,7 +29,9 @@
 #include "coinfactory.h"
 
 #include <array>
-#include <set>
+#include <vector>
+#include <cmath>
+#include <map>
 
 class GameScene : public cocos2d::Scene
 {
@@ -42,8 +44,9 @@ public:
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
     bool onTouchBegan(Touch* touch, Event* event);
-    void onTouchEnded(Touch* touch, Event* event);
+    void onTouchEnded(Touch* touch);
     void onTouchMoved(Touch* touch, Event* event);
+    CoinSpace::CoinItem * MakeRandomlyPlacedCoin(int type);
 
     bool CoinsAreOverlap(std::array<CoinSpace::CoinItem*,3>);
 
@@ -53,7 +56,10 @@ private:
     int coinQuantityOnStart;
     Vec2 oldTouchLocation;
     CoinSpace::CoinItem * selectedCoin;
-    std::multiset<CoinSpace::CoinItem*> Coins;
+//    std::vector<CoinSpace::CoinItem*> Coins;
+    std::map<int, std::vector<CoinSpace::CoinItem *>> Coins;
+
+
 };
 
 #endif // __HELLOWORLD_SCENE_H__

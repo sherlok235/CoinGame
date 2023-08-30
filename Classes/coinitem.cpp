@@ -6,30 +6,12 @@ namespace CoinSpace {
 Coin_0::Coin_0():CoinItem(0)
 {
     mType = 0;
-    setFrameRect(cocos2d::Size(65,65));
-}
-
-Coin_0::Coin_0(int type):CoinItem(type)
-{
-    if(coin_4_IsCreated && coin_7_IsCreated)
-        exit(0);
-    mType = type;
-}
-
-int Coin_0::getType() const
-{
-    return mType;
-}
-
-void Coin_0::setType(short type)
-{
-    mType = type;
-
+    setContentSize(cocos2d::Size(65,65));
+    CoinItem::mType = 0;
 }
 
 Coin_0::~Coin_0()
 {
-
 }
 
 CoinItem::CoinItem()
@@ -41,6 +23,8 @@ CoinItem::CoinItem(int type)
 {
     setDefaultImage(type);
     temp = true;
+//    setBoun
+    //setPhysicsBody(cocos2d::PhysicsBody().addShape())
 }
 
 bool CoinItem::onTouchBegan(Touch *touch, Event *event)
@@ -56,14 +40,16 @@ void CoinItem::onTouchEnded(Touch *touch, Event *event)
 
 void CoinItem::onTouchMoved(Touch *touch, Event *event)
 {
+//   this->getPhysicsBody()
+   this->getPhysicsBody()->createCircle(10);
+//   touch->setTouchInfo(0,touch->getLocation().y,touch->getLocation().x,0,100);
     targetPosition = touch->getLocation();
-    auto currentPos = initialpos;
+//    auto currentPos = initialpos;
 
-    auto direction = targetPosition - currentPos;
+    auto direction = targetPosition - initialpos;
 
-    // Don't normalize as we want to move exactly to target
-
-    auto newPos = currentPos + direction;
+    //  Optimize it
+    auto newPos = initialpos + direction;
 
     // Clamp new position to visible bounds
     auto visibleSize = cocos2d::Director::getInstance()->getVisibleSize();
@@ -72,6 +58,13 @@ void CoinItem::onTouchMoved(Touch *touch, Event *event)
 
     // Update position, clamped to bounds
     this->setPosition(newPos);
+
+
+//   auto diff = touch->getDelta();
+
+   // Update position using offset
+//   touch->_point = touch->getLocation();
+//   this->setPosition(touch->getLocation() + diff);
 }
 
 CoinItem::~CoinItem()
@@ -81,20 +74,32 @@ CoinItem::~CoinItem()
 
 void CoinItem::setDefaultImage( int type)
 {
-    this->setTexture(("coins_" + std::to_string(type) + ".png"));
-    //    this->autorelease();
+    this->setTexture(("new/coins_" + std::to_string(type) + ".png"));
 }
+
+short CoinItem::type() const
+{
+    return mType;
+}
+
 
 void CoinItem::setHeightRect(float newHeightRect)
 {
     heightRect = newHeightRect;
 }
 
-void CoinItem::setFrameRect(cocos2d::Size size)
+void CoinItem::setContentSize(cocos2d::Size size)
 {
     auto frame = new cocos2d::SpriteFrame();
     frame->setRect(cocos2d::Rect(this->getPosition(),cocos2d::Size(size.width,size.height)));
     this->createWithSpriteFrame(frame);
+//    setAnchorPoint(cocos2d::Vec2(0,0));
+
+//    this->setHeightRect(size.height);
+//    this->setWidthRect(size.width);
+
+//    setColor(cocos2d::Color3B::BLACK);
+
 }
 
 bool CoinItem::operator<(CoinItem *other)
@@ -107,10 +112,10 @@ void CoinItem::setWidthRect(float newWidthRect)
     widthRect = newWidthRect;
 }
 
-Coin_1::Coin_1():Coin_0(1)
+Coin_1::Coin_1():CoinItem(1)
 {
-    Coin_0::mType = 1;
-    setFrameRect(cocos2d::Size(86,92));
+    CoinItem::mType = 1;
+    setContentSize(cocos2d::Size(86,92));
     //    setDefaultImage(mType);
 }
 
@@ -119,20 +124,20 @@ Coin_1::~Coin_1()
 
 }
 
-Coin_2::Coin_2():Coin_0(2)
+Coin_2::Coin_2():CoinItem(2)
 {
-    Coin_0::mType = 2;
-    setFrameRect(cocos2d::Size(92,100));
+    CoinItem::mType = 2;
+    setContentSize(cocos2d::Size(92,100));
 }
 
 Coin_2::~Coin_2()
 {
 }
 
-Coin_3::Coin_3():Coin_0(3)
+Coin_3::Coin_3():CoinItem(3)
 {
-    Coin_0::mType = 3;
-    setFrameRect(cocos2d::Size(107,116));
+    CoinItem::mType = 3;
+    setContentSize(cocos2d::Size(107,116));
 }
 
 Coin_3::~Coin_3()
@@ -140,10 +145,10 @@ Coin_3::~Coin_3()
 
 }
 
-Coin_4::Coin_4():Coin_0(4){
+Coin_4::Coin_4():CoinItem(4){
     coin_4_IsCreated = true;
-    Coin_0::mType = 4;
-    setFrameRect(cocos2d::Size(116,120));
+    CoinItem::mType = 4;
+    setContentSize(cocos2d::Size(116,120));
 
 }
 
@@ -152,10 +157,10 @@ Coin_4::~Coin_4()
 
 }
 
-Coin_5::Coin_5():Coin_0(5)
+Coin_5::Coin_5():CoinItem(5)
 {
-    Coin_0::mType = 5;
-    setFrameRect(cocos2d::Size(117,133));
+    CoinItem::mType = 5;
+    setContentSize(cocos2d::Size(117,133));
 
 }
 
@@ -164,10 +169,10 @@ Coin_5::~Coin_5()
 
 }
 
-Coin_6::Coin_6():Coin_0(6)
+Coin_6::Coin_6():CoinItem(6)
 {
-    Coin_0::mType = 6;
-    setFrameRect(cocos2d::Size(125,136));
+    CoinItem::mType = 6;
+    setContentSize(cocos2d::Size(125,136));
 }
 
 Coin_6::~Coin_6()
@@ -175,17 +180,17 @@ Coin_6::~Coin_6()
 
 }
 
-Coin_7::Coin_7():Coin_0(7)
+Coin_7::Coin_7():CoinItem(7)
 {
     coin_7_IsCreated = true;
-    Coin_0::mType = 7;
-    setFrameRect(cocos2d::Size(107,116));
+    CoinItem::mType = 7;
+    setContentSize(cocos2d::Size(107,116));
 
 }
 
 Coin_7::~Coin_7()
 {
-    setFrameRect(cocos2d::Size(135,151));
+    setContentSize(cocos2d::Size(135,151));
 
 }
 
