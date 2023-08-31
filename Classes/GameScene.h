@@ -43,9 +43,9 @@ public:
     
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
-    bool onTouchBegan(Touch* touch, Event* event);
+    bool onTouchBegan(Touch* touch,Event *event);
+    void onTouchMoved(Touch* touch);
     void onTouchEnded(Touch* touch);
-    void onTouchMoved(Touch* touch, Event* event);
     [[nodiscard]] CoinSpace::CoinItem * MakeRandomlyPlacedCoin(int type);
 
     bool CoinsAreOverlap(std::array<CoinSpace::CoinItem*,3>);

@@ -66,11 +66,10 @@ bool GameScene::init()
         }
         MakeRandomlyPlacedCoin(coinType);
     }
-
     auto touchListener = EventListenerTouchOneByOne::create();
     touchListener->onTouchBegan = CC_CALLBACK_2(GameScene::onTouchBegan, this);
     touchListener->onTouchEnded = CC_CALLBACK_1(GameScene::onTouchEnded, this);
-    touchListener->onTouchMoved = CC_CALLBACK_2(GameScene::onTouchMoved, this);
+    touchListener->onTouchMoved = CC_CALLBACK_1(GameScene::onTouchMoved, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
 
     return true;
@@ -85,6 +84,7 @@ void GameScene::menuCloseCallback(Ref* pSender)
 bool GameScene::onTouchBegan(Touch *touch, Event *event)
 {
     event->stopPropagation();
+    selectedCoin = nullptr;
     for(int i = 0; i<=7;++i){
         if(Coins[i].empty())
             continue;
@@ -92,8 +92,9 @@ bool GameScene::onTouchBegan(Touch *touch, Event *event)
         for (auto coin : Coins[i]) {
             if (coin->getBoundingBox().containsPoint(touch->getLocation())) {
                 // Handle the touch event for the specific coin
-                coin->onTouchBegan(touch, event);
+                coin->onTouchBegan(touch);
                 selectedCoin = coin;
+                break;
             }
         }
     }
@@ -102,17 +103,20 @@ bool GameScene::onTouchBegan(Touch *touch, Event *event)
 }
 
 void GameScene::onTouchEnded(Touch *touch)
-{//CoinSpace::coin_4_IsCreated &&
+{
 
-    if(!wasMoved && selectedCoin == nullptr)
+    if(!wasMoved && (selectedCoin == nullptr))
         return;
 
     std::set<std::array<CoinSpace::CoinItem*, 3>> overlappingCombos;
     int selectedType = selectedCoin->type();
+    double  oldPosition_x = selectedCoin->getPosition().x, oldPosition_y = selectedCoin->getPosition().y;
+    bool foundOverlap = false;
 
-    for (size_t i = 0; i < Coins[selectedType].size() - 2; i++) {
-        for (size_t j = i + 1; j < Coins[selectedType].size() - 1; j++) {
-            for (size_t k = j + 1; k < Coins[selectedType].size(); k++) {
+    for (size_t i = 0; (i < Coins[selectedType].size() - 2) && !foundOverlap; i++) {
+        for (size_t j = i + 1; (j < Coins[selectedType].size() - 1) && !foundOverlap ; j++) {
+            for (size_t k = j + 1; (k < Coins[selectedType].size()) && !foundOverlap; k++) {
+
                 std::array<CoinSpace::CoinItem*, 3> combo = {
                     Coins[selectedType][i],
                     Coins[selectedType][j], Coins[selectedType][k]};
@@ -122,16 +126,16 @@ void GameScene::onTouchEnded(Touch *touch)
                 }
 
                 if(CoinsAreOverlap(combo)){
+                    foundOverlap = true;
                     for(auto a : combo){
                         this->removeChild(a);
+                        delete a;
+                        MakeRandomlyPlacedCoin(selectedType + 1);
                     }
 
-                    for(int i = 0; i<3;++i)
-                        MakeRandomlyPlacedCoin(selectedType + 1);
-                    auto last = Coins[selectedType].back();
-                    last = std::next(last,-1);
-
-                    break;
+                    Coins[selectedType].erase(Coins[selectedType].begin() + k);
+                    Coins[selectedType].erase(Coins[selectedType].begin() + j);
+                    Coins[selectedType].erase(Coins[selectedType].begin() + i);
                 }
             }
         }
@@ -140,12 +144,12 @@ void GameScene::onTouchEnded(Touch *touch)
     selectedCoin = nullptr;
 }
 
-void GameScene::onTouchMoved(Touch *touch, Event *event)
+void GameScene::onTouchMoved(Touch *touch)
 {
     if(!selectedCoin)
         return;
 
-    selectedCoin->onTouchMoved(touch,event);
+    selectedCoin->onTouchMoved(touch);
     wasMoved = true;
 }
 
@@ -190,7 +194,6 @@ bool GameScene::CoinsAreOverlap(std::array<CoinSpace::CoinItem *,3> coins )
         }
 
         if (overlap12 && overlap13 && overlap23) {
-                CCLOG("Are overlap");
                 return true;
         }
     }

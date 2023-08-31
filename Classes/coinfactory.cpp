@@ -2,10 +2,7 @@
 
 namespace CoinSpace {
 
-    CoinFactory::CoinFactory()
-    {
-
-    }
+    CoinFactory::CoinFactory() {}
 
     CoinItem *CoinFactory::CreateCoin(int type)
     {

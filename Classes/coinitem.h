@@ -26,26 +26,17 @@ namespace CoinSpace{
         CoinItem();
         CoinItem(int type);
 
-        virtual bool onTouchBegan(Touch* touch, Event* event) ;
-        virtual void onTouchEnded(Touch* touch, Event* event) ;
-        virtual void onTouchMoved(Touch* touch, Event* event) ;
-
-        void setWidthRect(float newWidthRect);
-        void setHeightRect(float newHeightRect);
-        void setContentSize(cocos2d::Size size);
-
-        bool operator< (CoinItem * other);
+        virtual bool onTouchBegan(Touch* touch) ;
+        virtual void onTouchMoved(Touch* touch) ;
+        virtual void onTouchEnded(Touch* touch) ;
 
         virtual ~CoinItem();
         short type() const;
-//        void setType(short newType);
-
     protected:
         cocos2d::Vec2 targetPosition, initialpos;
         void setDefaultImage(int type);
         float heightRect, widthRect;
         short mType;
-        bool temp;
     };
 
     class Coin_0 : public CoinItem{
