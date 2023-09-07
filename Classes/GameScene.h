@@ -50,7 +50,6 @@ public:
 
     bool CoinsAreOverlap(std::array<CoinSpace::CoinItem*,3>);
 
-    // implement the "static create()" method manually
     CREATE_FUNC(GameScene);
 private:
     bool wasMoved = false;

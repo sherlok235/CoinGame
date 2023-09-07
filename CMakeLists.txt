@@ -130,8 +130,6 @@ if(NOT ANDROID)
     add_executable(${APP_NAME} ${all_code_files}
 
         Classes/Definitions.h
-#        Classes/Cocos-Helper-master/SonarCocosHelperCPP/SonarFrameworks.cpp
-#        Classes/Cocos-Helper-master/SonarCocosHelperCPP/SonarFrameworks.h
     )
 else()
     add_library(${APP_NAME} SHARED ${all_code_files})

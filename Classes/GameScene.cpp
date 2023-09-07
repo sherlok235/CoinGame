@@ -110,7 +110,6 @@ void GameScene::onTouchEnded(Touch *touch)
 
     std::set<std::array<CoinSpace::CoinItem*, 3>> overlappingCombos;
     int selectedType = selectedCoin->type();
-    double  oldPosition_x = selectedCoin->getPosition().x, oldPosition_y = selectedCoin->getPosition().y;
     bool foundOverlap = false;
 
     for (size_t i = 0; (i < Coins[selectedType].size() - 2) && !foundOverlap; i++) {
